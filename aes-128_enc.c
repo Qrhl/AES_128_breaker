@@ -5,6 +5,7 @@
  * Constant-time XTIME
  *
  * Pierre Karpman, 2016-04; 2017-10
+ * Alexandre Mouchet, Quentin Rühl 2017-10
  */
 
 #include "aes-128_enc.h"

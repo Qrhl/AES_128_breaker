@@ -5,7 +5,6 @@
  * Constant-time XTIME
  *
  * Pierre Karpman, 2016-04; 2017-10
- * Quentin Rühl & Alexandre Mouchet 2017-10
  */
 
 #include "aes-128_enc.h"
@@ -42,7 +41,8 @@ uint8_t xtime(uint8_t x)
 
 	m ^= 1;
 	m -= 1;
-	m &= 0x1B;
+	//m &= 0x1B;
+	m &= 0x7B; // Answer Question 1
 
 	return ((x << 1) ^ m);
 }
@@ -56,7 +56,6 @@ static const uint8_t RC[10] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0
  *Invert the Shift Rows and SubBytes of a matrix
  */
 void inv_half_round(uint8_t block[AES_BLOCK_SIZE]){
-	uint8_t tmp;
 	int i;
 
 	for(i=0; i<AES_BLOCK_SIZE;i++){
@@ -231,7 +230,6 @@ void prev_aes128_round_key(const uint8_t next_key[16], uint8_t prev_key[16], int
 {
 	/*Inv Key Schedule*/
 	int ronde;
-	int counter;
 	uint8_t* p_key_0 = next_key + AES_128_KEY_SIZE - AES_KEY_WORD_SIZE;
 	uint8_t* p_key_m1 = p_key_0 - AES_KEY_WORD_SIZE;
 
@@ -258,13 +256,6 @@ void prev_aes128_round_key(const uint8_t next_key[16], uint8_t prev_key[16], int
 	for(i=0;i<AES_128_KEY_SIZE;i++){
 		prev_key[i]=next_key[i];
 	}
-
-	printf("Previous Key (Round %d): ", round);
-	for(counter = 0; counter < AES_BLOCK_SIZE; counter++){
-		printf("%x ",next_key[counter]);
-	}
-	printf("\n" );
-
 }
 
 /*
@@ -369,6 +360,65 @@ bool isvalueinarray(uint8_t val, uint8_t* arr, int size) {
 }
 
 int main (int argc, char **argv) {
+	uint8_t key[AES_128_KEY_SIZE] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
+	uint8_t final_key[AES_128_KEY_SIZE];
+	uint8_t tmp_key[AES_128_KEY_SIZE];
+	uint8_t ind, i, j;
+
+	/* Exercice 1 : Warming up --- Question 2 */
+	printf("*** Exercice 1 : Warming up --- Question 2\n");
+
+	/* Uncomment the next part in order to test
+	the function "next_aes128_round_key" and "prev_aes128_round_key" */
+	/*next_aes128_round_key(key, final_key, 0);
+	for(i=0;i<AES_128_KEY_SIZE;i++){
+		tmp_key[i] = final_key[i];
+	}
+	printf("Next key (Round 0)\n");
+	print_block(final_key);
+	next_aes128_round_key(tmp_key, final_key, 1);
+	for(i=0;i<AES_128_KEY_SIZE;i++){
+		tmp_key[i] = final_key[i];
+	}
+	printf("Next key (Round 1)\n");
+	print_block(final_key);
+	next_aes128_round_key(tmp_key, final_key, 2);
+	for(i=0;i<AES_128_KEY_SIZE;i++){
+		tmp_key[i] = final_key[i];
+	}
+	printf("Next key (Round 2)\n");
+	print_block(final_key);
+	next_aes128_round_key(tmp_key, final_key, 3);
+	for(i=0;i<AES_128_KEY_SIZE;i++){
+		tmp_key[i] = final_key[i];
+	}
+	printf("Next key (Round 3)\n");
+	print_block(final_key);
+
+	printf("----------------------\n\n");
+
+	prev_aes128_round_key(tmp_key, final_key, 3);
+	for(i=0;i<AES_128_KEY_SIZE;i++){
+		tmp_key[i] = final_key[i];
+	}
+	printf("Previous key (Round 3)\n");
+	print_block(final_key);
+	prev_aes128_round_key(tmp_key, final_key, 2);
+	for(i=0;i<AES_128_KEY_SIZE;i++){
+		tmp_key[i] = final_key[i];
+	}
+	printf("Previous key (Round 2)\n");
+	print_block(final_key);
+	prev_aes128_round_key(tmp_key, final_key, 1);
+	for(i=0;i<AES_128_KEY_SIZE;i++){
+		tmp_key[i] = final_key[i];
+	}
+	printf("Previous key (Round 1)\n");
+	print_block(final_key);
+	prev_aes128_round_key(tmp_key, final_key, 0);
+	printf("Previous key (Round 0)\n");
+	print_block(final_key);*/
+
 	/* Exercice 1 : Warming up --- Question 3 */
 	printf("*** Exercice 1 : Warming up --- Question 3\n");
 	uint8_t x[AES_BLOCK_SIZE] = {0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34 };
@@ -377,13 +427,9 @@ int main (int argc, char **argv) {
 	function_f(x, key_256);
 	printf("\n");
 
-	/* Exercice 2 */
-	printf("*** Exercice 2\n");
-	uint8_t ind, i, j;
-	uint8_t key[AES_128_KEY_SIZE] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
-	uint8_t final_key[AES_128_KEY_SIZE];
+	/* Exercice 2 --- Question 1-2-3 */
+	printf("*** Exercice 2 --- Question 1-2-3\n");
 	uint8_t potential_key[AES_128_KEY_SIZE];
-	uint8_t tmp_key[AES_128_KEY_SIZE];
 	uint8_t res1[AES_128_KEY_SIZE][AES_128_KEY_SIZE] = {0,0};
 	uint8_t res2[AES_128_KEY_SIZE][AES_128_KEY_SIZE] = {0,0};
 	uint8_t res3[AES_128_KEY_SIZE][AES_128_KEY_SIZE] = {0,0};

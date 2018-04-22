@@ -1,5 +1,6 @@
 # AES_128_breaker
 
+This code implements a Square attack on 3 and a half rounds of AES.
 
 Compile with :
 
